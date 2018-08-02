@@ -55,3 +55,78 @@ class FurnitureOrder(models.Model):
         ('color', '颜色问题'),
 
     ], string='售后类别', copy=False, index=True, track_visibility='onchange')
+
+    # 销售环节
+    @api.multi
+    def action_cancel(self):
+        self.write({'state': 'cancel'})
+
+    @api.multi
+    def action_cl(self):
+        self.write({'state': 'cl'})
+
+    @api.multi
+    def action_ct(self):
+        self.write({'state': 'ct'})
+
+    @api.multi
+    def action_confirm_plan(self):
+        self.write({'state': 'confirm_plan'})
+
+    @api.multi
+    def action_pay(self):
+        self.write({'state': 'pay'})
+        # 生产环节
+
+    @api.multi
+    def action_decompose(self):
+        self.write({'state': 'decompose'})
+
+    @api.multi
+    def action_kl(self):
+        self.write({'state': 'kl'})
+
+    @api.multi
+    def action_dk(self):
+        self.write({'state': 'dk'})
+
+    @api.multi
+    def action_fb(self):
+        self.write({'state': 'fb'})
+
+    @api.multi
+    def action_try(self):
+        self.write({'state': 'try'})
+
+    @api.multi
+    def action_yuy(self):
+        self.write({'state': 'yuy'})
+
+    @api.multi
+    def action_transport(self):
+        self.write({'state': 'transport'})
+
+    @api.multi
+    def action_install(self):
+        self.write({'state': 'install'})
+
+    @api.multi
+    def action_after_order(self):
+        self.write({'state': 'after_order'})
+
+    # 售后环节
+    @api.multi
+    def action_bx(self):
+        self.write({'state': 'bx'})
+
+    @api.multi
+    def action_con_wxplan(self):
+        self.write({'state': 'con_wxplan'})
+
+    @api.multi
+    def action_repair(self):
+        self.write({'state': 'repair'})
+
+    @api.multi
+    def action_check(self):
+        self.write({'state': 'check'})

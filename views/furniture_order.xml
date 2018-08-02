@@ -1,101 +1,248 @@
 <?xml version="1.0"?>
 <odoo>
+    <!--视图-->
+    <!--销售环节 form view inherte -->
+    <record model="ir.ui.view" id="furniture_order_sale_form">
+        <field name="name">sale.haunjie</field>
+        <field name="model">sale.order</field>
+        <!--视图的继承模式为：基础视图  extend为扩展视图-->
+         <field name="mode">primary</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="20"/>
+        <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_unlock']" position="after">
+                <button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>
+                <button name="action_cl" states="sent,sale" type="object" string="测量" confirm="确认订单状态为测量?"/>
+                <button name="action_ct" states="cl" type="object" string="出图" confirm="确认订单状态为出图?"/>
+                <button name="action_confirm_plan" states="ct" type="object" string="确认方案" confirm="确认订单状态为确认方案?"/>
+                <button name="action_pay" states="confirm_plan" type="object" string="已付款" confirm="确认订单状态为已付款?"/>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position='replace'>
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale,cl,ct,confirm_plan,pay,"/>
+            </xpath>
+        </field>
+    </record>
+    <!--生产订单form-->
+    <record model="ir.ui.view" id="furniture_order_production_form">
+        <field name="name">production_order_form</field>
+        <field name="model">sale.order</field>
+        <!--视图的继承模式为：基础视图  extend为扩展视图-->
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
 
-        <!--销售环节 view inherte -->
-        <record model="ir.ui.view" id="furniture_order_sale_form">
-            <field name="name">销售环节</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <!--<field name="priority" eval="20"/>-->
-            <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
-            <field name="arch" type="xml">
-                <xpath expr="//button[@name='action_draft']" position="after">
-                    <button name="action_draft" states="cancel" type="object" string="Set to Quotation"/>
-                     <button name="action_cl" states="sent,sale" type="object" string="测量" confirm="确认订单状态为测量?"/>
-                    <button name="action_ct" states="cl" type="object" string="出图" confirm="确认订单状态为出图?"/>
-                    <button name="action_confirm_plan" states="ct" type="object" string="确认方案" confirm="确认订单状态为确认方案?"/>
-                    <button name="action_pay" states="confirm_plan" type="object" string="已付款" confirm="确认订单状态为已付款?"/>
+            <xpath expr="//button[@name='action_unlock']" position="after">
+                <button name="action_decompose" attrs="{'invisible': [('state', 'not in', ['pay','done'])]}"
+                        type="object" string="拆单"/>
+                <button name="action_kl" states="decompose" type="object" string="开料" confirm="确认订单状态为开料?"/>
+                <button name="action_dk" states="kl" type="object" string="打孔" confirm="确认订单状态为打孔?"/>
+                <button name="action_fb" states="dk" type="object" string="封边" confirm="确认订单状态为封边?"/>
+                <button name="action_try" states="fb" type="object" string="试装" confirm="确认订单状态为试装?"/>
+                <button name="action_yuy" states="try" type="object" string="预约" confirm="确认订单状态为预约?"/>
+                <button name="action_transport" states="yuy" type="object" string="运输" confirm="确认订单状态为运输?"/>
+                <button name="action_install" states="transport" type="object" string="安装" confirm="确认订单状态为安装?"/>
+                <button name="action_after_order" states="install" type="object" string="需售后" confirm="确认订单状态为需售后?"/>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position='replace'>
+                <field name="state" widget="statusbar" statusbar_visible="decompose,kl,dk,fb,try,yuy,transport"/>
+            </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="edit">false</attribute>
+                <attribute name="create">false</attribute>
+                <attribute name="import">false</attribute>
+            </xpath>
+
+        </field>
+
+    </record>
+<!--售后环节form-->
+     <record model="ir.ui.view" id="furniture_order_afterSale_form">
+        <field name="name">afterSale_order_form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+         <field name="mode">primary</field>
+         <field name="priority" eval="20"/>
+        <field name="arch" type="xml" >
+            <xpath expr="//button[@name='action_draft']" position="after">
+                    <button name="action_bx" states="after_order" type="object" string="报修" confirm="确认订单状态为报修?"/>
+                    <button name="action_con_wxplan" states="bx" type="object" string="确认维修方案" confirm="确认订单状态为确认维修方案?"/>
+                    <button name="action_repair" states="con_wxplan" type="object" string="维修" confirm="确认订单状态为维修?"/>
+                    <button name="action_check" states="repair" type="object" string="验收" confirm="确认订单状态为验收?"/>
 
             </xpath>
-            </field>
-        </record>
+     <xpath expr="//field[@name='state']" position='replace'>
+				<field name="state" widget="statusbar" statusbar_visible="bx,con_wxplan,repair,check" />
+	  </xpath>
+     <xpath expr="//field[@name='payment_term_id']" position='after'>
+				<field name="saleafter_cate"/>
+	  </xpath>
+     <xpath expr="//field[@name='note']" position='replace'>
+				<field name="desc"/>
+	  </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">false</attribute>
+
+            </xpath>
+        </field>
+    </record>
 
 
 
 
-        <!--生产订单production saler.order view inherte -->
-        <record model="ir.ui.view" id="furniture_order_no_invoce_state_tree">
-            <field name="name">生产订单</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_tree"/>
-            <field name="priority" eval="20"/>
-            <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='invoice_status']" position='replace'>
-                </xpath>
-                 <xpath expr="//field[@name='state']" position='attributes'>
-				    <attribute name="invisible">False</attribute>
-                 </xpath>
-            </field>
-        </record>
+    <!--无发票状态字段及创建、导入按钮   的订单 tree production saler.order view inherte -->
+    <record model="ir.ui.view" id="furniture_order_no_invoce_create_import_state_tree">
+        <field name="name">no_invoce_state_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="mode">primary</field>
+        <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_status']" position='replace'>
+            </xpath>
+            <xpath expr="//field[@name='state']" position='attributes'>
+                <attribute name="invisible">False</attribute>
+            </xpath>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="import">false</attribute>
+            </xpath>
+        </field>
+    </record>
 
-         <record id="furnitrue_order_sale_order" model="ir.actions.act_window">
-            <field name="name"> 销售环节</field>
-            <field name="res_model">sale.order</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="sale.view_order_tree"/>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
+    <!--销售环节 tree-->
+    <!--无发票状态字段的订单 tree production saler.order view inherte -->
+    <record model="ir.ui.view" id="furniture_order_no_invoce_state_tree">
+        <field name="name">no_invoce_state_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="mode">primary</field>
+        <!--<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>-->
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_status']" position='replace'>
+            </xpath>
+            <xpath expr="//field[@name='state']" position='attributes'>
+                <attribute name="invisible">False</attribute>
+            </xpath>
+             <xpath expr="//tree" position="attributes">
+                 <!--不起作用-->
+                 <attribute name="import">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+
+
+
+
+
+    <!--动作-->
+    <record id="furnitrue_order_sale_order" model="ir.actions.act_window">
+        <field name="name">销售环节</field>
+        <field name="res_model">sale.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state','in', ['draft','sent', 'sale','cl','ct','confirm_plan'])]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
                 ...销售环节的订单...
-              </p>
-            </field>
-        </record>
-
-
-
-        <record id="furnitrue_order_production_order" model="ir.actions.act_window">
-            <field name="name">生产订单</field>
-            <field name="res_model">sale.order</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="furniture_order_no_invoce_state_tree"/>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
+            </p>
+        </field>
+    </record>
+    <record id="furnitrue_order_production_order" model="ir.actions.act_window">
+        <field name="name">生产订单</field>
+        <field name="res_model">sale.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state','in', ['pay','decompose', 'kl','dk','fb','try','yuy','transport','install'])]
+        </field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
                 ...进入生产状态的订单...
-              </p>
-            </field>
-        </record>
+            </p>
+        </field>
+    </record>
 
-     <record id="furniture_action_customer_tree_view" model="ir.actions.act_window.view">
-            <field name="sequence" eval="1"/>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="sale.view_order_tree"/>
-            <field name="act_window_id" ref="furnitrue_order_sale_order"/>
-        </record>
+    <!--&lt;!&ndash;售后订单&ndash;&gt;-->
+    <record id="furnitrue_order_afterSale_order" model="ir.actions.act_window">
+        <field name="name">售后订单</field>
+        <field name="res_model">sale.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state','in', ['after_order','bx', 'con_wxplan','repair','check'])]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                ...进入售后状态的订单...
+            </p>
+        </field>
+    </record>
+
+
+
+    <!--自定义form,tree-->
+    <!--销售环节窗口动作-->
+    <record id="furniture_action_customer_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="furniture_order_no_invoce_state_tree"/>
+        <field name="act_window_id" ref="furnitrue_order_sale_order"/>
+    </record>
     <record id="furniture_action_customer_form_view" model="ir.actions.act_window.view">
-            <field name="sequence" eval="2"/>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="furniture_order_sale_form"/>
-            <field name="act_window_id" ref="furnitrue_order_sale_order"/>
-        </record>
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="furniture_order_sale_form"/>
+        <field name="act_window_id" ref="furnitrue_order_sale_order"/>
+    </record>
+    <!--生产订单窗口动作-->
+
+    <record id="furniture_action_customer_production_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="furniture_order_no_invoce_create_import_state_tree"/>
+        <field name="act_window_id" ref="furnitrue_order_production_order"/>
+    </record>
+    <record id="furniture_action_customer_production_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="furniture_order_production_form"/>
+        <field name="act_window_id" ref="furnitrue_order_production_order"/>
+    </record>
+    <!--&lt;!&ndash;售后订单&ndash;&gt;-->
+    <record id="furniture_action_customer_afterSale_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="furniture_order_no_invoce_create_import_state_tree"/>
+        <field name="act_window_id" ref="furnitrue_order_afterSale_order"/>
+    </record>
+    <record id="furniture_action_customer_afterSale_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="furniture_order_afterSale_form"/>
+        <field name="act_window_id" ref="furnitrue_order_afterSale_order"/>
+    </record>
 
 
-        <!--<record id="sunpop_action_customer_form_view2" model="ir.actions.act_window.view">-->
-            <!--<field name="sequence" eval="2"/>-->
-            <!--<field name="view_mode">tree</field>-->
-            <!--<field name="view_id" ref="felive_view_partner_customer_tree"/>-->
-            <!--<field name="act_window_id" ref="felive_action_partner_customer_form"/>-->
-        <!--</record>-->
 
 
 
-<menuitem id="furniture_order_sale_menu" name="销售" parent="sale.sale_menu_root" sequence="2"/>
-<menuitem id="furniture_order_sale" name="订单" action="furnitrue_order_sale_order" parent="furniture_order_sale_menu" sequence="1"/>
+    <!--菜单-->
 
-<menuitem id="furniture_order_production_order_menu" name="生产" parent="sale.sale_menu_root" sequence="2"/>
-<menuitem id="furniture_order_production_order" name="生产订单" action="furnitrue_order_production_order" parent="furniture_order_production_order_menu" sequence="1"/>
+    <menuitem id="furniture_order_sale_menu" name="销售" parent="sale.sale_menu_root" sequence="2"/>
+    <menuitem id="furniture_order_sale" name="订单" action="furnitrue_order_sale_order" parent="furniture_order_sale_menu"
+              sequence="1"/>
+
+    <menuitem id="furniture_order_production_order_menu" name="生产" parent="sale.sale_menu_root" sequence="2"/>
+    <menuitem id="furniture_order_production_order" name="生产订单" action="furnitrue_order_production_order"
+              parent="furniture_order_production_order_menu" sequence="1"/>
+
+<menuitem id="furniture_order_afterSale_menu" name="售后" parent="sale.sale_menu_root" sequence="2"/>
+    <menuitem id="furniture_order_afterSale_order" name="售后订单" action="furnitrue_order_afterSale_order"
+              parent="furniture_order_afterSale_menu" sequence="1"/>
 
 
 </odoo>
